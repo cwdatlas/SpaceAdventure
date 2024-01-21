@@ -1,6 +1,6 @@
 class Medium():
     name = "Medium Fuel Tank"
     # in kg (specifically dry mass)
-    mass = 25000
+    mass = 27000
     # in kg
-    liquid_fuel = 370700
+    liquid_fuel = 400700
