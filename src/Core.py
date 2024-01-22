@@ -44,9 +44,9 @@ class core:
         print("  \/_/ /_/\/_____/\/_____/\/_/\/_/ \/_____/  \/_/     \/_____/\/_____/\/_/\/_____/\/____/ \/_____/\/_/ /_/ ")
 
         print("Welcome to rocket builder, Here you can build your very own rocket and fly it!")
-        print("Your goal is to build a rocket that can get to orbit, or even as far as Jupiter! Type help for more information")
-        print("Build your rocket by typing in capsule, tank, and engine to choose your parts, then type launch to launch!")
-        print("You can always use exit to exit the game. If you dont know the commands or need mroe help, then type help.")
+        print("Your goal is to build a rocket that can get to orbit! Type help for more information")
+        print("Build your rocket by typing in 'capsule', 'tank', and 'engine' to choose your parts, then type 'launch' to launch!")
+        print("You can always use 'exit' to exit the game. If you dont know the commands or need more help, then type 'help'.")
         print("Take note that you wont be able to use commands in the capsule, tank and engine builder bays")
 
         #main game loop
