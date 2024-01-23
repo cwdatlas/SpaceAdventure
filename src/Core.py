@@ -1,15 +1,18 @@
 
+import math
+import time
+
 from Models.BaseCapsule import Capsule
 from Models.BaseEngine import Engine
 from Models.BaseTank import Tank
-import math
-import time
+
+
 class core:
     def __init__(self):
         print("inisializing application")
         # inisialize dictionary that holds commands
         self.commands = {"capsule": self.Capsule, "engine": self.Engine, "help": self.Help, "launch": self.Launch, "reset": self.Reset,
-                    "status": self.Status, "tank": self.Tank}
+                    "status": self.Status, "tank": self.Tank, "thank you": self.thanks}
         # inisialize dictionary that holds rocket parts (rocket should be a class in a long term projecct)
         self.rocket = {"name": "First Rocket", "capsule": None, "tank": None, "engine": None}
         # set game status
@@ -78,14 +81,15 @@ class core:
 
     def Tank(self):
         # Create a list of tanks to choose from
-        tanks = {"small": Tank("small", 10000, 75000),
-                    "medium": Tank("medium", 27000, 400700),
-                    "large": Tank("large", 137000, 2077000)}
+        tanks = {"small": Tank("small", 10000, 75000, 2.4),
+                 "medium": Tank("medium", 27000, 400700, 3.7),
+                 "large": Tank("large", 137000, 2077000, 10.1)}
         print("Welcome to the Tank Build Bay, choose a tank from below")
         for i in tanks:
             print("---", i, "tank ---")
-            print("-Mass ",        tanks[i].mass, "kg")
+            print("-Mass        ", tanks[i].mass, "kg")
             print("-liquid Fuel ", tanks[i].liquid_fuel, "kg")
+            print("-Width       ", tanks[i].width, "meters")
 
         # loop so the user can have more than one chance at making a decision
         choosing = True
@@ -99,25 +103,60 @@ class core:
                 print("Please type in one of the three tank names")
 
     def Engine(self):
+        if self.rocket["tank"] == None:
+            print("Sorry, you must have a tank to mount engines to. Go to the Tank Build Bay by typing 'tank'.")
+            return None
         # Create a list of engines to choose from
-        engines = {"F-1": Engine("F-1", 8400, 7770, 304),
-                    "Raptor": Engine("Raptor", 1600, 2690, 363),
-                    "RD-170": Engine("RD-170", 9750, 7900, 337)}
+        engines = {"F-1": Engine("F-1", 8400, 7770, 304, 3.7),
+                   "Raptor": Engine("Raptor", 1600, 2690, 363, 1.3),
+                   "RD-170": Engine("RD-170", 9750, 7900, 337, 3.8)}
         print("Welcome to the Engine Build Bay, choose an Engine from below")
         for i in engines:
             print("---", i, "engine ---")
-            print("-Mass ",   engines[i].mass, "kg")
+            print("-Mass   ", engines[i].mass, "kg")
             print("-Thrust ", engines[i].thrust, "kn")
-            print("-ISP ",    engines[i].isp, "seconds")
+            print("-ISP    ", engines[i].isp, "seconds")
+            print("-Width  ", engines[i].width, "meters")
 
         # loop so the user can have more than one chance at making a decision
         choosing = True
         while choosing:
             engine = input("F-1, Raptor, RD-170 ->")
             if engine in engines:
-                self.rocket["engine"] = engines[engine]
-                print("Engine set to", self.rocket["engine"].name)
-                choosing = False
+                chosen_engine = engines[engine]
+                print("How many engines do you want?")
+                engine_number = 0
+                number_choosing = True
+                while number_choosing:
+                    engine_number = input("1-100 ->")
+                    try:
+                        engine_number = int(engine_number)
+                        number_choosing = False
+                    except:
+                        print("The engineers are confused with your non numaric choice")
+
+                    if engine_number not in range(100):
+                        print("We can't add more than 100 engines to the booster")
+
+                if engine_number in range(101):
+                    # Calculate how many engines can fit on the booster
+                    tank_mount_area = pow(self.rocket["tank"].width / 2, 2) * math.pi
+                    engine_area = pow(chosen_engine.width / 2, 2) * math.pi
+                    number_of_mountable_engines = int(tank_mount_area / engine_area)
+                    # If the chosen number of engines is higher than what could be mounted, then mount the max number of engines
+                    if number_of_mountable_engines < engine_number:
+                        engine_number = number_of_mountable_engines
+                        print("You requested more engines than could be mounted, so we added all we could!")
+                        if engine_number == 0:
+                            print("The engineers cant seem to fit the engine on the rocket, try a smaller engine or larger booster")
+                    self.rocket["engine"] = Engine(chosen_engine.name + " engine section",
+                                                   chosen_engine.mass * engine_number,
+                                                   chosen_engine.thrust * engine_number,
+                                                   chosen_engine.isp,
+                                                   self.rocket["tank"].width)
+                    print("Engine set to", chosen_engine.name)
+                    print("Installed engines:", engine_number)
+                    choosing = False
             else:
                 print("Please type in one of the three engine names")
 
@@ -131,18 +170,20 @@ class core:
 
         if(self.rocket["tank"] != None): # Checking if user has set specific part
             print("-- Fuel Tank --")
-            print("Name:", self.rocket["tank"].name)
-            print("Dry Mass:", self.rocket["tank"].mass)
+            print("Name:     ", self.rocket["tank"].name)
+            print("Dry Mass: ", self.rocket["tank"].mass)
             print("Fuel Mass:", self.rocket["tank"].liquid_fuel)
+            print("Width:    ", self.rocket["tank"].width)
 
         if(self.rocket["engine"] != None): # Checking if user has set specific part
             print("-- Engine --")
-            print("Name:", self.rocket["engine"].name)
-            print("Mass:", self.rocket["engine"].mass)
+            print("Name:  ", self.rocket["engine"].name)
+            print("Mass:  ", self.rocket["engine"].mass)
             print("Thrust:", self.rocket["engine"].thrust)
-            print("ISP:", self.rocket["engine"].isp)
+            print("ISP:   ", self.rocket["engine"].isp)
+            print("Width: ", self.rocket["engine"].width)
 
-        if(self.rocket["engine"] != None or self.rocket["capsule"] != None or self.rocket["tank"] != None):
+        if(self.rocket["engine"] != None and self.rocket["capsule"] != None and self.rocket["tank"] != None):
             print("-- Rocket Stats --")
             print("Thrust to Weight Ratio:", self.get_thrust_to_weight())
             print("Total Mass:", self.get_rocket_mass())
@@ -151,7 +192,7 @@ class core:
 
     def Launch(self):
         if self.rocket["capsule"] == None or self.rocket["tank"] == None or self.rocket["engine"] == None:
-            print("Make sure to add all componeents to the rocket before launching!")
+            print("Make sure to add all components to the rocket before launching!")
         else:
             # start countdown!
             for i in range(5):
@@ -167,10 +208,10 @@ class core:
                 mf = m - self.rocket["tank"].liquid_fuel
                 delta_v = isp * g * math.log(m / mf)
                 print("your Delta V is", delta_v)
-                if delta_v > 7300:
+                if delta_v > 8000:
                     print("You Achieved orbit!!! good job!!")
                 else:
-                    print("You didn't make it to orbit! You'll need to achieve more than 7300 Delta v! There is a way!")
+                    print("You didn't make it to orbit! You'll need to achieve more than 8000 Delta v! There is a way!")
 
 
     def Reset(self):
@@ -187,8 +228,7 @@ class core:
         print(
             "1. Once Launched Rocket Builder checks thrust to mass ratio (TWR). If your TWR is less than 1.5, you fail to get to orbit")
         print(
-            "2. Your Delta V will then be calculated. Depending on it's value, you are able to achieve orbit around one of the "
-            "plannets. Avaliable plannets are Earth, (basic orbit), Mars, and Jupiter")
+            "2. Your Delta V will then be calculated. Depending on it's value, you are able to achieve orbit around Earth")
         print(
             "This game is supposeded to be a learning experience, so the values for the capsules and engines are accurate. Sadly, Delta V"
             " Calculations are not."
@@ -206,3 +246,7 @@ class core:
         print("help    -> looks like you already know what this does")
         print(
             "____________________________________________________________________________________________________________________________________")
+
+    #Only polite people can see this
+    def thanks(self):
+        print("Anzhela worked very hard on debugging this project. I thank her and I thank you!")
