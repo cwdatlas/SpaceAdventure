@@ -1,13 +1,7 @@
 
-from Models.Capsules.Apollo import Apollo
-from Models.Capsules.Dragon import Dragon
-from Models.Capsules.Orion import Orion
-from Models.Engines.Raptor import Raptor
-from Models.Engines.F_1 import F1
-from Models.Engines.RD_170 import RD170
-from Models.FuelTanks.Large import Large
-from Models.FuelTanks.Medium import Medium
-from Models.FuelTanks.Small import Small
+from Models.BaseCapsule import Capsule
+from Models.BaseEngine import Engine
+from Models.BaseTank import Tank
 import math
 import time
 class core:
@@ -62,7 +56,9 @@ class core:
 
     def Capsule(self):
         # Create a list of capsules to choose from
-        capsules = {"Apollo": Apollo, "Dragon": Dragon, "Orion":Orion}
+        capsules = {"Apollo": Capsule("Apollo", 11900, 3),
+                    "Dragon": Capsule("Draggon", 12519, 4),
+                    "Orion": Capsule("Orion", 10400, 4)}
         print("Welcome to the Capule Build Bay, choose a capsule from below")
         for i in capsules:
             print("---", i ,"Crew Capsule ---")
@@ -82,7 +78,9 @@ class core:
 
     def Tank(self):
         # Create a list of tanks to choose from
-        tanks = {"small": Small, "medium": Medium, "large": Large}
+        tanks = {"small": Tank("small", 10000, 75000),
+                    "medium": Tank("medium", 27000, 400700),
+                    "large": Tank("large", 137000, 2077000)}
         print("Welcome to the Tank Build Bay, choose a tank from below")
         for i in tanks:
             print("---", i, "tank ---")
@@ -102,7 +100,9 @@ class core:
 
     def Engine(self):
         # Create a list of engines to choose from
-        engines = {"F-1": F1, "Raptor": Raptor, "RD-170": RD170}
+        engines = {"F-1": Engine("F-1", 8400, 7770, 304),
+                    "Raptor": Engine("Raptor", 1600, 2690, 363),
+                    "RD-170": Engine("RD-170", 9750, 7900, 337)}
         print("Welcome to the Engine Build Bay, choose an Engine from below")
         for i in engines:
             print("---", i, "engine ---")
